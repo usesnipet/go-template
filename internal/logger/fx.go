@@ -28,12 +28,12 @@ func (l *FXEventLogger) LogEvent(event fxevent.Event) {
 			l.log.Debugf("[Fx] HOOK OnStart\t\t%s called by %s ran successfully in %s", e.FunctionName, e.CallerName, e.Runtime)
 		}
 	case *fxevent.OnStopExecuting:
-		l.log.Debugf("[Fx] HOOK OnStop\t\t%s executing (caller: %s)", e.FunctionName, e.CallerName)
+		l.log.Infof("[Fx] HOOK OnStop\t\t%s executing", e.FunctionName)
 	case *fxevent.OnStopExecuted:
 		if e.Err != nil {
-			l.log.Errorf("[Fx] HOOK OnStop\t\t%s called by %s failed in %s: %+v", e.FunctionName, e.CallerName, e.Runtime, e.Err)
+			l.log.Errorf("[Fx] HOOK OnStop\t\t%s failed in %s: %+v", e.FunctionName, e.Runtime, e.Err)
 		} else {
-			l.log.Debugf("[Fx] HOOK OnStop\t\t%s called by %s ran successfully in %s", e.FunctionName, e.CallerName, e.Runtime)
+			l.log.Infof("[Fx] HOOK OnStop\t\t%s ran successfully in %s", e.FunctionName, e.Runtime)
 		}
 	case *fxevent.Supplied:
 		if e.Err != nil {
@@ -110,6 +110,8 @@ func (l *FXEventLogger) LogEvent(event fxevent.Event) {
 	case *fxevent.Stopped:
 		if e.Err != nil {
 			l.log.Errorf("[Fx] ERROR\t\tFailed to stop cleanly: %+v", e.Err)
+		} else {
+			l.log.Infof("[Fx] STOPPED")
 		}
 	case *fxevent.RollingBack:
 		l.log.Errorf("[Fx] ERROR\t\tStart failed, rolling back: %+v", e.StartErr)

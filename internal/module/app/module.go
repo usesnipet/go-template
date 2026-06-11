@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"net"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/mayron1806/api-template/internal/logger"
@@ -24,14 +25,28 @@ var Module = fx.Module("app",
 	) {
 		lc.Append(fx.Hook{
 			OnStart: func(ctx context.Context) error {
-				log.Infof("starting server on port %d", cfg.Server.Port)
-				if err := app.Listen(fmt.Sprintf(":%d", cfg.Server.Port)); err != nil {
-					log.Errorf("failed to start server: %v", err)
+				addr := fmt.Sprintf(":%d", cfg.Server.Port)
+				ln, err := net.Listen("tcp", addr)
+				if err != nil {
+					return fmt.Errorf("listen on %s: %w", addr, err)
 				}
+
+				go func() {
+					if err := app.Listener(ln); err != nil {
+						log.Errorf("server listener stopped: %v", err)
+					}
+				}()
+
+				log.Infof("server listening on %s", addr)
 				return nil
 			},
 			OnStop: func(ctx context.Context) error {
-				return app.Shutdown()
+				log.Info("shutting down server...")
+				if err := app.ShutdownWithContext(ctx); err != nil {
+					return fmt.Errorf("shutdown server: %w", err)
+				}
+				log.Info("server stopped")
+				return nil
 			},
 		})
 	}),

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
@@ -34,7 +33,8 @@ func main() {
 		fx.WithLogger(func() fxevent.Logger {
 			return logger.NewFXEventLogger(appLogger)
 		}),
+		fx.StopTimeout(cfg.Server.ShutdownTimeout),
 		fx.Supply(cfg, appLogger),
 		app.Module,
-	).Start(context.Background())
+	).Run()
 }

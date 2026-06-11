@@ -7,3 +7,5 @@ tmp_dir = "tmp"
   include_ext = ["go"]
   exclude_dir = ["tmp", "vendor", ".git"]
   delay = 300
+  send_interrupt = true
+  kill_delay = 15000
