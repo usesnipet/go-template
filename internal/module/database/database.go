@@ -7,7 +7,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
-	"github.com/mayron1806/cantinho-api/internal/shared/config"
+	"github.com/mayron1806/api-template/internal/module/config"
 )
 
 type DB struct {
@@ -15,12 +15,13 @@ type DB struct {
 	Builder squirrel.StatementBuilderType
 }
 
-func New(cfg config.DatabaseConfig) (*DB, error) {
-	dsn := cfg.URL
+func newDatabase(cfg *config.Config) (*DB, error) {
+	dbConfig := cfg.Database
+	dsn := dbConfig.URL
 	if dsn == "" {
 		dsn = fmt.Sprintf(
 			"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-			cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Database, cfg.SSLMode,
+			dbConfig.Host, dbConfig.Port, dbConfig.User, dbConfig.Password, dbConfig.Database, dbConfig.SSLMode,
 		)
 	}
 
