@@ -7,19 +7,19 @@ type UserHandler struct {
 }
 
 func (h *UserHandler) RegisterRoutes(router fiber.Router) {
-	router.Get("/:id", h.FindById)
+	router.Get("/:id", h.FindByID)
 }
 
-func (h *UserHandler) FindById(c fiber.Ctx) error {
+func (h *UserHandler) FindByID(c fiber.Ctx) error {
 	id := c.Params("id")
-	user, err := h.service.FindById(c.Context(), id)
+	user, err := h.service.FindByID(c.Context(), id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 	return c.JSON(user)
 }
 
-func NewUserHandler(service *UserService) *UserHandler {
+func newUserHandler(service *UserService) *UserHandler {
 	return &UserHandler{
 		service: service,
 	}

@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/Masterminds/squirrel"
@@ -13,6 +14,22 @@ import (
 type DB struct {
 	*sqlx.DB
 	Builder squirrel.StatementBuilderType
+}
+
+func (db *DB) Run(
+	toSql func() (string, []any, error),
+	dest any,
+	ctx context.Context,
+) error {
+	query, args, err := toSql()
+	if err != nil {
+		return err
+	}
+	return db.DB.GetContext(ctx, dest, query, args...)
+}
+
+func (db *DB) Close() error {
+	return db.DB.Close()
 }
 
 func newDatabase(cfg *config.Config) (*DB, error) {
@@ -30,15 +47,11 @@ func newDatabase(cfg *config.Config) (*DB, error) {
 		return nil, fmt.Errorf("connect database: %w", err)
 	}
 
-	db.SetMaxOpenConns(25)
-	db.SetMaxIdleConns(5)
+	db.SetMaxOpenConns(dbConfig.MaxOpenConns)
+	db.SetMaxIdleConns(dbConfig.MaxIdleConns)
 
 	return &DB{
 		DB:      db,
 		Builder: squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar),
 	}, nil
-}
-
-func (db *DB) Close() error {
-	return db.DB.Close()
 }
