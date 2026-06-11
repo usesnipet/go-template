@@ -6,8 +6,8 @@ import (
 	"net"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/mayron1806/api-template/config"
 	"github.com/mayron1806/api-template/internal/logger"
-	"github.com/mayron1806/api-template/internal/module/config"
 	"github.com/mayron1806/api-template/internal/module/database"
 	"github.com/mayron1806/api-template/internal/module/user"
 	"go.uber.org/fx"

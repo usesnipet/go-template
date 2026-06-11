@@ -5,9 +5,9 @@ import (
 	"log"
 	"os"
 
+	"github.com/mayron1806/api-template/config"
 	"github.com/mayron1806/api-template/internal/logger"
 	"github.com/mayron1806/api-template/internal/module/app"
-	"github.com/mayron1806/api-template/internal/module/config"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
 )

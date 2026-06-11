@@ -8,7 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
-	"github.com/mayron1806/api-template/internal/module/config"
+	"github.com/mayron1806/api-template/config"
 )
 
 type DB struct {
