@@ -4,6 +4,7 @@ CREATE TABLE "users" (
   "name" character varying(255) NOT NULL,
   "email" character varying(255) NOT NULL,
   "password" character varying(255) NOT NULL,
+  "role" character varying(255) NOT NULL DEFAULT 'user',
   "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("id"),

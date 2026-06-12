@@ -4,9 +4,6 @@ GO ?= go
 ATLAS ?= atlas
 ATLAS_ENV ?= local
 
-# make db-generate add_users
-# make db-generate "add users"
-# make db-generate MIGRATION_NAME=add_users
 MIGRATION_NAME ?= $(strip $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS)))
 RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 $(RUN_ARGS):

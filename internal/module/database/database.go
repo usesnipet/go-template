@@ -1,7 +1,6 @@
 package database
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/Masterminds/squirrel"
@@ -16,18 +15,6 @@ type DB struct {
 	Builder squirrel.StatementBuilderType
 }
 
-func (db *DB) Run(
-	toSql func() (string, []any, error),
-	dest any,
-	ctx context.Context,
-) error {
-	query, args, err := toSql()
-	if err != nil {
-		return err
-	}
-	return db.DB.GetContext(ctx, dest, query, args...)
-}
-
 func (db *DB) Close() error {
 	return db.DB.Close()
 }
@@ -35,12 +22,6 @@ func (db *DB) Close() error {
 func newDatabase(cfg *config.Config) (*DB, error) {
 	dbConfig := cfg.Database
 	dsn := dbConfig.URL
-	if dsn == "" {
-		dsn = fmt.Sprintf(
-			"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-			dbConfig.Host, dbConfig.Port, dbConfig.User, dbConfig.Password, dbConfig.Database, dbConfig.SSLMode,
-		)
-	}
 
 	db, err := sqlx.Connect("postgres", dsn)
 	if err != nil {
