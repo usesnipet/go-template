@@ -4,7 +4,7 @@ tmp_dir = "tmp"
 [build]
   cmd = "make build"
   entrypoint = ["./tmp/api"]
-  include_ext = ["go"]
+  include_ext = ["go", ".env"]
   exclude_dir = ["tmp", "vendor", ".git"]
   delay = 300
   send_interrupt = true

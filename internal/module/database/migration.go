@@ -20,6 +20,7 @@ func runMigrations(cfg *config.Config, logger *logger.Logger) error {
 
 	logger.Info("running migrations...")
 	dsn := cfg.Database.URL
+	logger.Infof("running migrations from %s", dsn)
 	root, err := os.Getwd()
 	if err != nil {
 		logger.Errorf("get working directory: %v", err)
