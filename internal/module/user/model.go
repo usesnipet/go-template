@@ -1,6 +1,10 @@
 package user
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Role string
 
@@ -10,11 +14,15 @@ const (
 )
 
 type User struct {
-	ID        string    `db:"id"`
-	Name      string    `db:"name"`
-	Email     string    `db:"email"`
-	Password  string    `db:"password"`
-	Role      Role      `db:"role"`
-	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
+	ID        uuid.UUID `gorm:"primaryKey"`
+	Name      string
+	Email     string
+	Password  string
+	Role      Role
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+func (u User) GetID() string {
+	return u.ID.String()
 }

@@ -6,7 +6,7 @@ import (
 )
 
 var Module = fx.Module("user",
-	fx.Provide(newUserService, newUserHandler),
+	fx.Provide(NewUserRepository, NewUserService, newUserHandler),
 	fx.Invoke(func(app *fiber.App, handler *UserHandler) {
 		handler.RegisterRoutes(app.Group("/users"))
 	}),

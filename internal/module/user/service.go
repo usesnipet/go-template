@@ -3,24 +3,23 @@ package user
 import (
 	"context"
 
-	"github.com/mayron1806/api-template/internal/module/database"
+	"github.com/mayron1806/api-template/internal/crud"
+	"github.com/mayron1806/api-template/internal/logger"
 )
 
 type UserService struct {
-	db *database.DB
+	*crud.Service[User]
 }
 
-func (s *UserService) Create(ctx context.Context, user *User) error {
-	return nil
+func (s *UserService) Create(ctx context.Context, model *CreateUserDTO) error {
+	return s.Service.Create(
+		ctx,
+		model.ToModel(),
+	)
 }
 
-func (s *UserService) FindByID(ctx context.Context, id string) (*User, error) {
-	user := &User{}
-	return user, nil
-}
-
-func newUserService(db *database.DB) *UserService {
+func NewUserService(repository *UserRepository, logger *logger.Logger) *UserService {
 	return &UserService{
-		db: db,
+		Service: crud.NewService(repository.Repository, logger),
 	}
 }
