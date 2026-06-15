@@ -24,6 +24,8 @@ build-prod:
 swagger:
 	@command -v swag >/dev/null 2>&1 || go install github.com/swaggo/swag/cmd/swag@latest
 	swag init -g main.go -d cmd/api,internal/api,internal/module -o docs --parseDependency
+	$(GO) run ./tools/normalizeswagger ./docs
+	cd web && pnpm codegen
 
 db-generate:
 	@set -a && [ -f .env ] && . ./.env; set +a; \

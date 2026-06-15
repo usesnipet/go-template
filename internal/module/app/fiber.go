@@ -2,9 +2,13 @@ package app
 
 import (
 	"io/fs"
+	"strings"
 
 	swaggo "github.com/gofiber/contrib/v3/swaggo"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/compress"
+	"github.com/gofiber/fiber/v3/middleware/cors"
+	"github.com/gofiber/fiber/v3/middleware/responsetime"
 	"github.com/gofiber/fiber/v3/middleware/static"
 	"github.com/mayron1806/api-template/config"
 	"github.com/mayron1806/api-template/web"
@@ -14,7 +18,16 @@ func NewFiber(cfg *config.Config) (*fiber.App, error) {
 	app := fiber.New(fiber.Config{
 		AppName: "API Template",
 	})
+
 	// Middlewares
+	app.Use(cors.New())
+	app.Use(responsetime.New())
+	app.Use(compress.New(compress.Config{
+		Level: compress.LevelBestSpeed,
+		Next: func(c fiber.Ctx) bool {
+			return !strings.HasSuffix(c.Path(), ".html")
+		},
+	}))
 
 	app.Get("/swagger/*", swaggo.HandlerDefault)
 

@@ -6,11 +6,12 @@ import { pluginTs } from "@kubb/plugin-ts";
 import { pluginZod } from "@kubb/plugin-zod";
 
 import type { ResolveNameParams } from "@kubb/core";
+
 function removeControllerSuffix(name: string) {
   return name.replace(/([-_]?controller[-_]?)/gi, "");
 }
 
-const nameTransformer = {
+const transformers = {
   name: (name: ResolveNameParams["name"]) => removeControllerSuffix(name),
 };
 
@@ -29,14 +30,14 @@ export default defineConfig({
       output: {
         path: "types",
       },
-      transformers: nameTransformer,
+      transformers,
     }),
     pluginClient({
       output: {
         path: "client",
       },
       importPath: "@/lib/api-client",
-      transformers: nameTransformer,
+      transformers,
     }),
     pluginReactQuery({
       output: {
@@ -45,7 +46,7 @@ export default defineConfig({
       client: {
         importPath: "@/lib/api-client",
       },
-      transformers: nameTransformer,
+      transformers,
     }),
     pluginZod({
       output: {
@@ -56,7 +57,7 @@ export default defineConfig({
       // typed: true,
       dateType: "string",
       unknownType: "unknown",
-      transformers: nameTransformer,
+      transformers,
     }),
   ],
 });
