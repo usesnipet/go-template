@@ -4,8 +4,8 @@
 */
 
 import * as z from "zod";
-import { createUserDTOSchema } from "./createUserDTOSchema.ts";
-import { errorResponseSchema } from "./errorResponseSchema.ts";
+import { apiErrorResponseSchema } from "./api/errorResponseSchema.ts";
+import { userCreateUserDTOSchema } from "./user/createUserDTOSchema.ts";
 
 /**
  * @description OK
@@ -15,16 +15,16 @@ export const postUsers200Schema = z.unknown()
 /**
  * @description Bad Request
  */
-export const postUsers400Schema = z.lazy(() => errorResponseSchema)
+export const postUsers400Schema = z.lazy(() => apiErrorResponseSchema)
 
 /**
  * @description Internal Server Error
  */
-export const postUsers500Schema = z.lazy(() => errorResponseSchema)
+export const postUsers500Schema = z.lazy(() => apiErrorResponseSchema)
 
 /**
  * @description User data
  */
-export const postUsersMutationRequestSchema = z.lazy(() => createUserDTOSchema)
+export const postUsersMutationRequestSchema = z.lazy(() => userCreateUserDTOSchema)
 
 export const postUsersMutationResponseSchema = z.lazy(() => postUsers200Schema)

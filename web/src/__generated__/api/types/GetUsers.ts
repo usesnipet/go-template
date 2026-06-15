@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { ErrorResponse } from "./ErrorResponse.ts";
-import type { User } from "./User.ts";
+import type { ApiErrorResponse } from "./api/ErrorResponse.ts";
+import type { ModelUser } from "./model/User.ts";
 
 export type GetUsersQueryParams = {
     /**
@@ -24,17 +24,17 @@ export type GetUsersQueryParams = {
 /**
  * @description OK
 */
-export type GetUsers200 = User[];
+export type GetUsers200 = ModelUser[];
 
 /**
  * @description Bad Request
 */
-export type GetUsers400 = ErrorResponse;
+export type GetUsers400 = ApiErrorResponse;
 
 /**
  * @description Internal Server Error
 */
-export type GetUsers500 = ErrorResponse;
+export type GetUsers500 = ApiErrorResponse;
 
 export type GetUsersQueryResponse = GetUsers200;
 

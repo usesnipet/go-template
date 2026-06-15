@@ -4,8 +4,8 @@
 */
 
 import * as z from "zod";
-import { errorResponseSchema } from "./errorResponseSchema.ts";
-import { userSchema } from "./userSchema.ts";
+import { apiErrorResponseSchema } from "./api/errorResponseSchema.ts";
+import { modelUserSchema } from "./model/userSchema.ts";
 
 export const getUsersQueryParamsSchema = z.object({
     "take": z.coerce.number().int().default(2000).describe("Maximum number of records"),
@@ -15,16 +15,16 @@ export const getUsersQueryParamsSchema = z.object({
 /**
  * @description OK
  */
-export const getUsers200Schema = z.array(z.lazy(() => userSchema))
+export const getUsers200Schema = z.array(z.lazy(() => modelUserSchema))
 
 /**
  * @description Bad Request
  */
-export const getUsers400Schema = z.lazy(() => errorResponseSchema)
+export const getUsers400Schema = z.lazy(() => apiErrorResponseSchema)
 
 /**
  * @description Internal Server Error
  */
-export const getUsers500Schema = z.lazy(() => errorResponseSchema)
+export const getUsers500Schema = z.lazy(() => apiErrorResponseSchema)
 
 export const getUsersQueryResponseSchema = z.lazy(() => getUsers200Schema)

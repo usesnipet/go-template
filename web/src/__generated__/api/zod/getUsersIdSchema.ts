@@ -4,8 +4,8 @@
 */
 
 import * as z from "zod";
-import { errorResponseSchema } from "./errorResponseSchema.ts";
-import { userSchema } from "./userSchema.ts";
+import { apiErrorResponseSchema } from "./api/errorResponseSchema.ts";
+import { modelUserSchema } from "./model/userSchema.ts";
 
 export const getUsersIdPathParamsSchema = z.object({
     "id": z.string().describe("User ID")
@@ -14,11 +14,11 @@ export const getUsersIdPathParamsSchema = z.object({
 /**
  * @description OK
  */
-export const getUsersId200Schema = z.lazy(() => userSchema)
+export const getUsersId200Schema = z.lazy(() => modelUserSchema)
 
 /**
  * @description Internal Server Error
  */
-export const getUsersId500Schema = z.lazy(() => errorResponseSchema)
+export const getUsersId500Schema = z.lazy(() => apiErrorResponseSchema)
 
 export const getUsersIdQueryResponseSchema = z.lazy(() => getUsersId200Schema)

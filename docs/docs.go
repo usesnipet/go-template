@@ -4,231 +4,233 @@ package docs
 import "github.com/swaggo/swag"
 
 const docTemplate = `{
-      "basePath": "/",
-      "definitions": {
-        "CreateUserDTO": {
-          "properties": {
-            "email": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "password": {
-              "type": "string"
-            },
-            "role": {
-              "allOf": [
-                {
-                  "$ref": "#/definitions/Role"
-                }
-              ],
-              "enum": [
-                "user",
-                "admin"
-              ]
-            }
-          },
-          "required": [
-            "email",
-            "name",
-            "password",
-            "role"
-          ],
-          "type": "object"
-        },
-        "ErrorResponse": {
-          "properties": {
-            "error": {
-              "example": "Error message",
-              "type": "string"
-            },
-            "statusCode": {
-              "example": 400,
-              "type": "integer"
-            },
-            "statusText": {
-              "example": "Bad Request",
-              "type": "string"
-            }
-          },
-          "type": "object"
-        },
-        "Role": {
-          "enum": [
-            "user",
-            "admin"
-          ],
-          "type": "string",
-          "x-enum-varnames": [
-            "RoleUser",
-            "RoleAdmin"
-          ]
-        },
-        "User": {
-          "properties": {
-            "createdAt": {
-              "type": "string"
-            },
-            "email": {
-              "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "password": {
-              "type": "string"
-            },
-            "role": {
-              "$ref": "#/definitions/Role"
-            },
-            "updatedAt": {
-              "type": "string"
-            }
-          },
-          "type": "object"
-        }
-      },
-      "info": {
+    "schemes": {{ marshal .Schemes }},
+    "swagger": "2.0",
+    "info": {
+        "description": "{{escape .Description}}",
+        "title": "{{.Title}}",
         "contact": {},
-        "description": "Documentation for the API Template.",
-        "title": "API Template",
-        "version": "1.0"
-      },
-      "paths": {
+        "version": "{{.Version}}"
+    },
+    "host": "{{.Host}}",
+    "basePath": "{{.BasePath}}",
+    "paths": {
         "/users": {
-          "get": {
-            "description": "Return a list of users with pagination and optional filters.",
-            "parameters": [
-              {
-                "default": 2000,
-                "description": "Maximum number of records",
-                "in": "query",
-                "name": "take",
-                "type": "integer"
-              },
-              {
-                "default": 0,
-                "description": "Number of records to skip",
-                "in": "query",
-                "name": "skip",
-                "type": "integer"
-              }
-            ],
-            "produces": [
-              "application/json"
-            ],
-            "responses": {
-              "200": {
-                "description": "OK",
-                "schema": {
-                  "items": {
-                    "$ref": "#/definitions/User"
-                  },
-                  "type": "array"
+            "get": {
+                "description": "Return a list of users with pagination and optional filters.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Find all users",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 2000,
+                        "description": "Maximum number of records",
+                        "name": "take",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Number of records to skip",
+                        "name": "skip",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.User"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
                 }
-              },
-              "400": {
-                "description": "Bad Request",
-                "schema": {
-                  "$ref": "#/definitions/ErrorResponse"
-                }
-              },
-              "500": {
-                "description": "Internal Server Error",
-                "schema": {
-                  "$ref": "#/definitions/ErrorResponse"
-                }
-              }
             },
-            "summary": "Find all users",
-            "tags": [
-              "users"
-            ]
-          },
-          "post": {
-            "consumes": [
-              "application/json"
-            ],
-            "description": "Create a new user.",
-            "parameters": [
-              {
-                "description": "User data",
-                "in": "body",
-                "name": "user",
-                "required": true,
-                "schema": {
-                  "$ref": "#/definitions/CreateUserDTO"
+            "post": {
+                "description": "Create a new user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Create user",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.CreateUserDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
                 }
-              }
-            ],
-            "produces": [
-              "application/json"
-            ],
-            "responses": {
-              "200": {
-                "description": "OK"
-              },
-              "400": {
-                "description": "Bad Request",
-                "schema": {
-                  "$ref": "#/definitions/ErrorResponse"
-                }
-              },
-              "500": {
-                "description": "Internal Server Error",
-                "schema": {
-                  "$ref": "#/definitions/ErrorResponse"
-                }
-              }
-            },
-            "summary": "Create user",
-            "tags": [
-              "users"
-            ]
-          }
+            }
         },
         "/users/{id}": {
-          "get": {
-            "description": "Return a user by ID.",
-            "parameters": [
-              {
-                "description": "User ID",
-                "in": "path",
-                "name": "id",
-                "required": true,
-                "type": "string"
-              }
-            ],
-            "produces": [
-              "application/json"
-            ],
-            "responses": {
-              "200": {
-                "description": "OK",
-                "schema": {
-                  "$ref": "#/definitions/User"
+            "get": {
+                "description": "Return a user by ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Find user by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
                 }
-              },
-              "500": {
-                "description": "Internal Server Error",
-                "schema": {
-                  "$ref": "#/definitions/ErrorResponse"
-                }
-              }
-            },
-            "summary": "Find user by ID",
-            "tags": [
-              "users"
-            ]
-          }
+            }
         }
-      },
-      "swagger": "2.0"
-    }`
+    },
+    "definitions": {
+        "api.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Error message"
+                },
+                "statusCode": {
+                    "type": "integer",
+                    "example": 400
+                },
+                "statusText": {
+                    "type": "string",
+                    "example": "Bad Request"
+                }
+            }
+        },
+        "model.Role": {
+            "type": "string",
+            "enum": [
+                "user",
+                "admin"
+            ],
+            "x-enum-varnames": [
+                "RoleUser",
+                "RoleAdmin"
+            ]
+        },
+        "model.User": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/model.Role"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.CreateUserDTO": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "role"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "enum": [
+                        "user",
+                        "admin"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.Role"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{

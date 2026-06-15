@@ -1,1 +1,0 @@
-{"properties":{"error":{"example":"Error message","type":"string"},"statusCode":{"example":400,"type":"integer"},"statusText":{"example":"Bad Request","type":"string"}},"type":"object","x-readme-ref-name":"ErrorResponse"}

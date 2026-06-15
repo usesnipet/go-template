@@ -5,10 +5,11 @@ import (
 
 	"github.com/mayron1806/api-template/internal/crud"
 	"github.com/mayron1806/api-template/internal/logger"
+	"github.com/mayron1806/api-template/internal/model"
 )
 
 type UserService struct {
-	*crud.Service[User]
+	*crud.Service[model.User]
 }
 
 func (s *UserService) Create(ctx context.Context, model *CreateUserDTO) error {

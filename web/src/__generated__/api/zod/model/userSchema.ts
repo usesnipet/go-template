@@ -4,16 +4,16 @@
 */
 
 import * as z from "zod";
-import { roleSchema } from "./roleSchema.ts";
+import { modelRoleSchema } from "./roleSchema.ts";
 
-export const userSchema = z.object({
+export const modelUserSchema = z.object({
     "createdAt": z.optional(z.string()),
 "email": z.optional(z.string()),
 "id": z.optional(z.string()),
 "name": z.optional(z.string()),
 "password": z.optional(z.string()),
 get "role"(){
-                return roleSchema.optional()
+                return modelRoleSchema.optional()
               },
 "updatedAt": z.optional(z.string())
     })

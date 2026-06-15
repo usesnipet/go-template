@@ -4,13 +4,13 @@
 */
 
 import * as z from "zod";
-import { roleSchema } from "./roleSchema.ts";
+import { modelRoleSchema } from "../model/roleSchema.ts";
 
-export const createUserDTOSchema = z.object({
+export const userCreateUserDTOSchema = z.object({
     "email": z.string(),
 "name": z.string(),
 "password": z.string(),
 get "role"(){
-                return roleSchema
+                return modelRoleSchema
               }
     })

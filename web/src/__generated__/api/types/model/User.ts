@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { Role } from "./Role.ts";
+import type { ModelRole } from "./Role.ts";
 
-export type User = {
+export type ModelUser = {
     /**
      * @type string | undefined
     */
@@ -29,7 +29,7 @@ export type User = {
     /**
      * @type string | undefined
     */
-    role?: Role;
+    role?: ModelRole;
     /**
      * @type string | undefined
     */

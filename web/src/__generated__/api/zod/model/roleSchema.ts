@@ -5,4 +5,4 @@
 
 import * as z from "zod";
 
-export const roleSchema = z.enum(["user", "admin"])
+export const modelRoleSchema = z.enum(["user", "admin"])

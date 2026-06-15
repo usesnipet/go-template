@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { Role } from "./Role.ts";
+import type { ModelRole } from "../model/Role.ts";
 
-export type CreateUserDTO = {
+export type UserCreateUserDTO = {
     /**
      * @type string
     */
@@ -18,5 +18,5 @@ export type CreateUserDTO = {
      * @type string
     */
     password: string;
-    role: Role;
+    role: ModelRole;
 };

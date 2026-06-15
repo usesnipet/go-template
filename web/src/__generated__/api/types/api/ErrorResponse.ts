@@ -4,7 +4,7 @@
 */
 
 
-export type ErrorResponse = {
+export type ApiErrorResponse = {
     /**
      * @type string | undefined
     */

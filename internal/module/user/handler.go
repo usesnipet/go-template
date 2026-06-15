@@ -3,6 +3,7 @@ package user
 import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/mayron1806/api-template/internal/filter"
+	"github.com/mayron1806/api-template/internal/model"
 )
 
 type UserHandler struct {
@@ -22,7 +23,7 @@ func (h *UserHandler) RegisterRoutes(router fiber.Router) {
 //	@Tags			users
 //	@Produce		json
 //	@Param			id	path		string	true	"User ID"
-//	@Success		200	{object}	User
+//	@Success		200	{object}	model.User
 //	@Failure		500	{object}	api.ErrorResponse
 //	@Router			/users/{id} [GET]
 func (h *UserHandler) FindByID(c fiber.Ctx) error {
@@ -42,12 +43,12 @@ func (h *UserHandler) FindByID(c fiber.Ctx) error {
 //	@Produce		json
 //	@Param			take	query		int	false	"Maximum number of records"	default(2000)
 //	@Param			skip	query		int	false	"Number of records to skip"	default(0)
-//	@Success		200		{array}		User
+//	@Success		200		{array}		model.User
 //	@Failure		400		{object}	api.ErrorResponse
 //	@Failure		500		{object}	api.ErrorResponse
 //	@Router			/users [GET]
 func (h *UserHandler) FindAll(c fiber.Ctx) error {
-	options, err := filter.FromFiber[User](c)
+	options, err := filter.FromFiber[model.User](c)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}

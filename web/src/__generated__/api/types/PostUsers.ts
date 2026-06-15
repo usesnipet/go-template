@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { CreateUserDTO } from "./CreateUserDTO.ts";
-import type { ErrorResponse } from "./ErrorResponse.ts";
+import type { ApiErrorResponse } from "./api/ErrorResponse.ts";
+import type { UserCreateUserDTO } from "./user/CreateUserDTO.ts";
 
 /**
  * @description OK
@@ -14,17 +14,17 @@ export type PostUsers200 = any;
 /**
  * @description Bad Request
 */
-export type PostUsers400 = ErrorResponse;
+export type PostUsers400 = ApiErrorResponse;
 
 /**
  * @description Internal Server Error
 */
-export type PostUsers500 = ErrorResponse;
+export type PostUsers500 = ApiErrorResponse;
 
 /**
  * @description User data
 */
-export type PostUsersMutationRequest = CreateUserDTO;
+export type PostUsersMutationRequest = UserCreateUserDTO;
 
 export type PostUsersMutationResponse = PostUsers200;
 

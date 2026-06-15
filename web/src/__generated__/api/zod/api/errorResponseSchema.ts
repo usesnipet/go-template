@@ -5,7 +5,7 @@
 
 import * as z from "zod";
 
-export const errorResponseSchema = z.object({
+export const apiErrorResponseSchema = z.object({
     "error": z.optional(z.string()),
 "statusCode": z.optional(z.int()),
 "statusText": z.optional(z.string())

@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { ErrorResponse } from "./ErrorResponse.ts";
-import type { User } from "./User.ts";
+import type { ApiErrorResponse } from "./api/ErrorResponse.ts";
+import type { ModelUser } from "./model/User.ts";
 
 export type GetUsersIdPathParams = {
     /**
@@ -17,12 +17,12 @@ export type GetUsersIdPathParams = {
 /**
  * @description OK
 */
-export type GetUsersId200 = User;
+export type GetUsersId200 = ModelUser;
 
 /**
  * @description Internal Server Error
 */
-export type GetUsersId500 = ErrorResponse;
+export type GetUsersId500 = ApiErrorResponse;
 
 export type GetUsersIdQueryResponse = GetUsersId200;
 
