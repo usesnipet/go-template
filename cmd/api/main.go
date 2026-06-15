@@ -1,7 +1,7 @@
 // @title           API Template
 // @version         1.0
 // @description     Documentation for the API Template.
-// @BasePath        /
+// @BasePath        /api
 package main
 
 import (

@@ -8,18 +8,21 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/compress"
 	"github.com/gofiber/fiber/v3/middleware/cors"
+	"github.com/gofiber/fiber/v3/middleware/recover"
 	"github.com/gofiber/fiber/v3/middleware/responsetime"
 	"github.com/gofiber/fiber/v3/middleware/static"
 	"github.com/mayron1806/api-template/config"
 	"github.com/mayron1806/api-template/web"
 )
 
-func NewFiber(cfg *config.Config) (*fiber.App, error) {
+func NewFiber(cfg *config.Config) (*fiber.App, fiber.Router, error) {
 	app := fiber.New(fiber.Config{
-		AppName: "API Template",
+		AppName:      "API Template",
+		ErrorHandler: errorHandler,
 	})
 
 	// Middlewares
+	app.Use(recover.New())
 	app.Use(cors.New())
 	app.Use(responsetime.New())
 	app.Use(compress.New(compress.Config{
@@ -39,5 +42,5 @@ func NewFiber(cfg *config.Config) (*fiber.App, error) {
 		Browse: false,
 	}))
 
-	return app, nil
+	return app, app.Group(config.APIPrefix), nil
 }

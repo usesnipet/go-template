@@ -6,8 +6,8 @@ import (
 )
 
 var Module = fx.Module("user",
-	fx.Provide(NewUserRepository, NewUserService, newUserHandler),
-	fx.Invoke(func(app *fiber.App, handler *UserHandler) {
-		handler.RegisterRoutes(app.Group("/users"))
+	fx.Provide(NewUserRepository, NewUserService, NewUserHandler),
+	fx.Invoke(func(api fiber.Router, handler *UserHandler) {
+		handler.RegisterRoutes(api.Group("/users"))
 	}),
 )

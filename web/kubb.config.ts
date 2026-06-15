@@ -36,6 +36,7 @@ export default defineConfig({
       output: {
         path: "client",
       },
+      baseURL: "/api",
       importPath: "@/lib/api-client",
       transformers,
     }),

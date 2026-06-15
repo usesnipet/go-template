@@ -8,7 +8,7 @@ import type { GetUsersIdQueryResponse, GetUsersIdPathParams, GetUsersId500 } fro
 import type { Client, RequestConfig, ResponseErrorConfig } from "@/lib/api-client";
 
 function getGetUsersIdUrl(id: GetUsersIdPathParams["id"]) {
-  const res = { method: 'GET', url: `/users/${id}` as const }
+  const res = { method: 'GET', url: `/api/users/${id}` as const }
   return res
 }
 

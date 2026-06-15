@@ -8,7 +8,7 @@ import type { PostUsersMutationRequest, PostUsersMutationResponse, PostUsers400,
 import type { Client, RequestConfig, ResponseErrorConfig } from "@/lib/api-client";
 
 function getPostUsersUrl() {
-  const res = { method: 'POST', url: `/users` as const }
+  const res = { method: 'POST', url: `/api/users` as const }
   return res
 }
 

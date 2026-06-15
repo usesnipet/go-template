@@ -2,18 +2,21 @@ package user
 
 import (
 	"github.com/gofiber/fiber/v3"
-	"github.com/mayron1806/api-template/internal/filter"
+	"github.com/mayron1806/api-template/internal/crud"
+	"github.com/mayron1806/api-template/internal/logger"
 	"github.com/mayron1806/api-template/internal/model"
 )
 
 type UserHandler struct {
-	service *UserService
+	*crud.Handler[model.User]
 }
 
 func (h *UserHandler) RegisterRoutes(router fiber.Router) {
 	router.Get("/:id", h.FindByID)
 	router.Get("/", h.FindAll)
 	router.Post("/", h.Create)
+	router.Put("/:id", h.UpdateByID)
+	router.Delete("/:id", h.DeleteByID)
 }
 
 // FindByID godoc
@@ -27,12 +30,7 @@ func (h *UserHandler) RegisterRoutes(router fiber.Router) {
 //	@Failure		500	{object}	api.ErrorResponse
 //	@Router			/users/{id} [GET]
 func (h *UserHandler) FindByID(c fiber.Ctx) error {
-	id := c.Params("id")
-	user, err := h.service.FindByID(c.Context(), id)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
-	}
-	return c.JSON(user)
+	return h.Handler.FindByID(c)
 }
 
 // FindAll godoc
@@ -48,16 +46,7 @@ func (h *UserHandler) FindByID(c fiber.Ctx) error {
 //	@Failure		500		{object}	api.ErrorResponse
 //	@Router			/users [GET]
 func (h *UserHandler) FindAll(c fiber.Ctx) error {
-	options, err := filter.FromFiber[model.User](c)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
-
-	users, err := h.service.FindBy(c.Context(), options)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
-	}
-	return c.JSON(users)
+	return h.Handler.FindBy(c)
 }
 
 // Create godoc
@@ -73,15 +62,43 @@ func (h *UserHandler) FindAll(c fiber.Ctx) error {
 //	@Failure		500	{object}	api.ErrorResponse
 //	@Router			/users [POST]
 func (h *UserHandler) Create(c fiber.Ctx) error {
-	user := &CreateUserDTO{}
-	if err := c.Bind().Body(user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
-	return h.service.Create(c.Context(), user)
+	return h.Handler.Create(c, &CreateUserDTO{})
 }
 
-func newUserHandler(service *UserService) *UserHandler {
+// UpdateByID godoc
+//
+//	@Summary		Update user by ID
+//	@Description	Update a user by ID.
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		string	true	"User ID"
+//	@Param			user	body		CreateUserDTO	true	"User data"
+//	@Success		200
+//	@Failure		400	{object}	api.ErrorResponse
+//	@Failure		500	{object}	api.ErrorResponse
+//	@Router			/users/{id} [PUT]
+func (h *UserHandler) UpdateByID(c fiber.Ctx) error {
+	return h.Handler.UpdateByID(c, &CreateUserDTO{})
+}
+
+// DeleteByID godoc
+//
+//	@Summary		Delete user by ID
+//	@Description	Delete a user by ID.
+//	@Tags			users
+//	@Produce		json
+//	@Param			id	path		string	true	"User ID"
+//	@Success		200
+//	@Failure		400	{object}	api.ErrorResponse
+//	@Failure		500	{object}	api.ErrorResponse
+//	@Router			/users/{id} [DELETE]
+func (h *UserHandler) DeleteByID(c fiber.Ctx) error {
+	return h.Handler.DeleteByID(c)
+}
+
+func NewUserHandler(service *UserService, logger *logger.Logger) *UserHandler {
 	return &UserHandler{
-		service: service,
+		Handler: crud.NewHandler(service.Service, logger),
 	}
 }

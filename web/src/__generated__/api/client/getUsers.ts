@@ -8,7 +8,7 @@ import type { GetUsersQueryResponse, GetUsersQueryParams, GetUsers400, GetUsers5
 import type { Client, RequestConfig, ResponseErrorConfig } from "@/lib/api-client";
 
 function getGetUsersUrl() {
-  const res = { method: 'GET', url: `/users` as const }
+  const res = { method: 'GET', url: `/api/users` as const }
   return res
 }
 

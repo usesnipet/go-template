@@ -24,7 +24,7 @@ func (r *Repository[T]) FindByID(ctx context.Context, id string) (T, error) {
 }
 
 func (r *Repository[T]) FindBy(ctx context.Context, options *filter.Options[T]) ([]T, error) {
-	query := options.ToGorm(gorm.G[T](r.DB.Debug()))
+	query := options.ToGorm(gorm.G[T](r.DB))
 	return query.Find(ctx)
 }
 
