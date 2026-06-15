@@ -1,14 +1,11 @@
 package filter
 
 import (
-	"log"
-
 	"gorm.io/gorm"
 )
 
 func (f *Options[T]) ToGorm(gormInterface gorm.Interface[T]) gorm.ChainInterface[T] {
 	chain := gormInterface.Limit(f.Take).Offset(f.Skip)
-	log.Println(f.Where.Fields)
 	for field, value := range f.Order.Fields {
 		chain = chain.Order(field + " " + string(value))
 	}

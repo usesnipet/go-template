@@ -8,7 +8,8 @@ import (
 type Level int
 
 const (
-	LevelDebug Level = iota
+	LevelVerbose Level = iota
+	LevelDebug
 	LevelInfo
 	LevelWarn
 	LevelError
@@ -16,6 +17,8 @@ const (
 
 func ParseLevel(value string) (Level, error) {
 	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "verbose":
+		return LevelVerbose, nil
 	case "debug":
 		return LevelDebug, nil
 	case "info":
@@ -31,6 +34,8 @@ func ParseLevel(value string) (Level, error) {
 
 func (l Level) String() string {
 	switch l {
+	case LevelVerbose:
+		return "VERBOSE"
 	case LevelDebug:
 		return "DEBUG"
 	case LevelInfo:

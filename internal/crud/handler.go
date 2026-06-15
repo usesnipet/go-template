@@ -14,6 +14,7 @@ type Handler[T model.Model] struct {
 
 func (h *Handler[T]) FindByID(c fiber.Ctx) error {
 	id := c.Params("id")
+	h.logger.Verbosef("%s %s FindByID: %s", c.Method(), c.Path(), id)
 	model, err := h.service.FindByID(c.Context(), id)
 	if err != nil {
 		return err
@@ -22,6 +23,7 @@ func (h *Handler[T]) FindByID(c fiber.Ctx) error {
 }
 
 func (h *Handler[T]) FindBy(c fiber.Ctx) error {
+	h.logger.Verbosef("%s %s FindBy", c.Method(), c.Path())
 	options, err := filter.FromFiber[T](c)
 	if err != nil {
 		return err
@@ -34,6 +36,7 @@ func (h *Handler[T]) FindBy(c fiber.Ctx) error {
 }
 
 func (h *Handler[T]) Create(c fiber.Ctx, dto any) error {
+	h.logger.Verbosef("%s %s Create", c.Method(), c.Path())
 	if err := c.Bind().Body(dto); err != nil {
 		return err
 	}
@@ -42,6 +45,7 @@ func (h *Handler[T]) Create(c fiber.Ctx, dto any) error {
 
 func (h *Handler[T]) UpdateByID(c fiber.Ctx, dto any) error {
 	id := c.Params("id")
+	h.logger.Verbosef("%s %s UpdateByID: %s", c.Method(), c.Path(), id)
 	if err := c.Bind().Body(dto); err != nil {
 		return err
 	}
@@ -50,6 +54,7 @@ func (h *Handler[T]) UpdateByID(c fiber.Ctx, dto any) error {
 
 func (h *Handler[T]) DeleteByID(c fiber.Ctx) error {
 	id := c.Params("id")
+	h.logger.Verbosef("%s %s DeleteByID: %s", c.Method(), c.Path(), id)
 	return h.service.DeleteByID(c.Context(), id)
 }
 

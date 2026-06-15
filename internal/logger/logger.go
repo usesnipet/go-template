@@ -12,6 +12,7 @@ import (
 
 const (
 	colorReset  = "\033[0m"
+	colorMagenta = "\033[35m"
 	colorCyan   = "\033[36m"
 	colorGreen  = "\033[32m"
 	colorYellow = "\033[33m"
@@ -52,6 +53,10 @@ func (l *Logger) write(level Level, color, prefix, format string, v ...any) {
 	}
 }
 
+func (l *Logger) Verbose(v ...interface{}) {
+	l.write(LevelVerbose, colorMagenta, "VERBOSE:", "%s", fmt.Sprint(v...))
+}
+
 func (l *Logger) Debug(v ...interface{}) {
 	l.write(LevelDebug, colorCyan, "DEBUG:", "%s", fmt.Sprint(v...))
 }
@@ -66,6 +71,10 @@ func (l *Logger) Warn(v ...interface{}) {
 
 func (l *Logger) Error(v ...interface{}) {
 	l.write(LevelError, colorRed, "ERROR:", "%s", fmt.Sprint(v...))
+}
+
+func (l *Logger) Verbosef(format string, v ...interface{}) {
+	l.write(LevelVerbose, colorMagenta, "VERBOSE:", format, v...)
 }
 
 func (l *Logger) Debugf(format string, v ...interface{}) {
