@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/mayron1806/api-template/internal/model"
+	"github.com/usesnipet/go-template/internal/model"
 )
 
 func FromFiber[T model.Model](c fiber.Ctx) (*Options[T], error) {

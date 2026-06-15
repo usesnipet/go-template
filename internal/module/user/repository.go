@@ -1,9 +1,9 @@
 package user
 
 import (
-	"github.com/mayron1806/api-template/internal/crud"
-	"github.com/mayron1806/api-template/internal/logger"
-	"github.com/mayron1806/api-template/internal/model"
+	"github.com/usesnipet/go-template/internal/crud"
+	"github.com/usesnipet/go-template/internal/logger"
+	"github.com/usesnipet/go-template/internal/model"
 	"gorm.io/gorm"
 )
 

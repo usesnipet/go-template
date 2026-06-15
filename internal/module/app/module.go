@@ -6,10 +6,10 @@ import (
 	"net"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/mayron1806/api-template/config"
-	"github.com/mayron1806/api-template/internal/logger"
-	"github.com/mayron1806/api-template/internal/module/database"
-	"github.com/mayron1806/api-template/internal/module/user"
+	"github.com/usesnipet/go-template/config"
+	"github.com/usesnipet/go-template/internal/logger"
+	"github.com/usesnipet/go-template/internal/module/database"
+	"github.com/usesnipet/go-template/internal/module/user"
 	"go.uber.org/fx"
 )
 

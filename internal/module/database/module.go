@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/mayron1806/api-template/config"
-	"github.com/mayron1806/api-template/internal/logger"
+	"github.com/usesnipet/go-template/config"
+	"github.com/usesnipet/go-template/internal/logger"
 	"go.uber.org/fx"
 	"gorm.io/gorm"
 )

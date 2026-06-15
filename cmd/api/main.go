@@ -9,10 +9,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/mayron1806/api-template/config"
-	_ "github.com/mayron1806/api-template/docs"
-	"github.com/mayron1806/api-template/internal/logger"
-	"github.com/mayron1806/api-template/internal/module/app"
+	"github.com/usesnipet/go-template/config"
+	_ "github.com/usesnipet/go-template/docs"
+	"github.com/usesnipet/go-template/internal/logger"
+	"github.com/usesnipet/go-template/internal/module/app"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
 )

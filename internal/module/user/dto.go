@@ -1,6 +1,6 @@
 package user
 
-import "github.com/mayron1806/api-template/internal/model"
+import "github.com/usesnipet/go-template/internal/model"
 
 // CreateUserDTO represents the payload to create a user.
 type CreateUserDTO struct {

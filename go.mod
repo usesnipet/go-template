@@ -1,4 +1,4 @@
-module github.com/mayron1806/api-template
+module github.com/usesnipet/go-template
 
 go 1.26.3
 

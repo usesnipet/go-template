@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/mayron1806/api-template/internal/filter"
-	"github.com/mayron1806/api-template/internal/logger"
-	"github.com/mayron1806/api-template/internal/model"
+	"github.com/usesnipet/go-template/internal/filter"
+	"github.com/usesnipet/go-template/internal/logger"
+	"github.com/usesnipet/go-template/internal/model"
 	"gorm.io/gorm"
 )
 
