@@ -1,17 +1,17 @@
 # Database Migrations
 
-This project uses [Atlas](https://atlasgo.io/) to manage PostgreSQL schema changes. Migrations follow a **declarative workflow**: you edit the desired schema in `schema.sql`, generate versioned migration files, and apply them to your database.
+This project uses [Atlas](https://atlasgo.io/) to manage PostgreSQL schema changes. Migrations follow a **declarative workflow**: you edit GORM models in `internal/model/`, generate versioned migration files, and apply them to your database.
 
 ## How it works
 
 ### Declarative schema
 
-`schema.sql` is the source of truth for the database structure. It describes the **desired state** of the schema, not incremental changes.
+GORM models in `internal/model/` are the source of truth for the database structure. Atlas reads them via the [atlas-provider-gorm](https://github.com/ariga/atlas-provider-gorm) and compares the desired state with the current migration history.
 
 When you need a schema change:
 
-1. Update `schema.sql` with the new tables, columns, indexes, or constraints.
-2. Run `make db-generate <name>` to compute the diff between the current migration history and the desired schema.
+1. Update the GORM structs in `internal/model/` (tags, fields, new models, etc.).
+2. Run `make db-generate <name>` to compute the diff between the current migration history and the models.
 3. Atlas writes paired `.up.sql` and `.down.sql` files into `migrations/`.
 
 ### Migration files
@@ -28,8 +28,8 @@ Example:
 
 ```
 migrations/
-├── 20260611231513_initial.up.sql
-├── 20260611231513_initial.down.sql
+├── 20260612163733_initial.up.sql
+├── 20260612163733_initial.down.sql
 └── atlas.sum
 ```
 
@@ -40,8 +40,18 @@ Atlas tracks applied migrations in a revisions table on the target database. On 
 Project settings live in `atlas.hcl`:
 
 ```hcl
+data "external_schema" "gorm" {
+  program = [
+    "go", "run", "-mod=mod",
+    "ariga.io/atlas-provider-gorm",
+    "load",
+    "--path", "./internal/model",
+    "--dialect", "postgres",
+  ]
+}
+
 env "local" {
-  src = "file://schema.sql"
+  src = data.external_schema.gorm.url
   dev = "docker://postgres/16/dev?search_path=public"
   migration {
     dir    = "file://migrations"
@@ -50,7 +60,7 @@ env "local" {
 }
 ```
 
-- **src** — desired schema (`schema.sql`)
+- **src** — desired schema loaded from GORM models
 - **dev** — ephemeral PostgreSQL 16 container used by Atlas to compute diffs (requires Docker)
 - **migration.dir** — output directory for generated files
 - **migration.format** — golang-migrate paired up/down files
@@ -65,9 +75,9 @@ The application reads the database URL from the `DB_URL` environment variable (s
 
 ## Workflow
 
-### 1. Change the schema
+### 1. Change the models
 
-Edit `schema.sql` to reflect the desired database structure.
+Edit GORM structs in `internal/model/` to reflect the desired database structure.
 
 ### 2. Generate a migration
 
@@ -81,7 +91,7 @@ This runs:
 atlas migrate diff "<name>" --env local
 ```
 
-Atlas compares the last applied migration state with `schema.sql` and creates new `.up.sql` / `.down.sql` files. Review the generated SQL before applying it.
+Atlas compares the last applied migration state with your GORM models and creates new `.up.sql` / `.down.sql` files. Review the generated SQL before applying it.
 
 ### 3. Apply migrations
 
@@ -131,14 +141,14 @@ atlas migrate down --url "$DB_URL" --env local 1
 Revert to a specific version:
 
 ```bash
-atlas migrate down --url "$DB_URL" --env local --to-version 20260611231513
+atlas migrate down --url "$DB_URL" --env local --to-version 20260612163733
 ```
 
 ## Makefile reference
 
 | Target | Description |
 |--------|-------------|
-| `make db-generate <name>` | Generate a new migration from changes in `schema.sql` |
+| `make db-generate <name>` | Generate a new migration from changes in GORM models |
 
 Environment variables:
 
@@ -151,6 +161,7 @@ Environment variables:
 
 | Command | Description |
 |---------|-------------|
+| `atlas schema inspect --env local --url "env://src"` | Inspect the schema derived from GORM models |
 | `atlas migrate apply --url "$DB_URL" --env local` | Apply all pending migrations |
 | `atlas migrate status --url "$DB_URL" --env local` | Show migration status |
 | `atlas migrate down --url "$DB_URL" --env local 1` | Roll back one migration |
@@ -160,7 +171,7 @@ Environment variables:
 ## Tips
 
 - **Always review** generated migration files before applying them to shared or production databases.
-- **Keep `schema.sql` in sync** with your models. After changing Go structs or domain models, update `schema.sql` and generate a migration.
+- **Add new models** to `internal/model/` with proper `gorm` tags; Atlas discovers them automatically.
 - **Do not edit** `atlas.sum` manually; run `atlas migrate hash` if you change migration files by hand.
 - **Commit** migration files and `atlas.sum` together so every environment applies the same history.
 - If `migrate apply` fails with a checksum error, run `atlas migrate validate --env local` to inspect the migration directory.

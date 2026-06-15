@@ -7,6 +7,7 @@ CREATE TABLE "users" (
   "role" character varying(255) NOT NULL DEFAULT 'user',
   "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY ("id"),
-  CONSTRAINT "users_email_key" UNIQUE ("email")
+  PRIMARY KEY ("id")
 );
+-- create index "users_email_key" to table: "users"
+CREATE UNIQUE INDEX "users_email_key" ON "users" ("email");

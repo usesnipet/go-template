@@ -7,6 +7,8 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/mayron1806/api-template/config"
+
+	_ "ariga.io/atlas-provider-gorm/gormschema"
 )
 
 func NewDatabase(cfg *config.Config) (*gorm.DB, error) {
