@@ -1,10 +1,15 @@
-import { useDocumentTitle } from "@/hooks/use-document-title";
+import { Page } from "@/components/page";
+
+import { SettingsContent } from "./content";
 
 export function SettingsPage() {
-  useDocumentTitle(() => "Settings", []);
   return (
-    <div>
-      <h1>Settings</h1>
-    </div>
+    <Page
+      title="Settings"
+      description="Settings description"
+      documentTitle="Settings"
+    >
+      <SettingsContent />
+    </Page>
   )
 }

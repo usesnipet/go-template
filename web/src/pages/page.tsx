@@ -1,10 +1,15 @@
-import { useDocumentTitle } from "@/hooks/use-document-title";
+import { Page } from "@/components/page";
+
+import { HomeContent } from "./content";
 
 export function HomePage() {
-  useDocumentTitle(() => "Home", []);
   return (
-    <div>
-      <h1>Home</h1>
-    </div>
+    <Page
+      title="Home"
+      description="Home description"
+      documentTitle="Home"
+    >
+      <HomeContent />
+    </Page>
   )
 }
