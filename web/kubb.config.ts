@@ -17,7 +17,7 @@ const nameTransformer = {
 export default defineConfig({
   root: ".",
   input: {
-    path: "../api/swagger-spec.json",
+    path: "../docs/swagger.json",
   },
   output: {
     path: "./src/__generated__/api",

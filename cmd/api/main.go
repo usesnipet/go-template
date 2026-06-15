@@ -1,3 +1,7 @@
+// @title           API Template
+// @version         1.0
+// @description     Documentation for the API Template.
+// @BasePath        /
 package main
 
 import (
@@ -6,6 +10,7 @@ import (
 	"os"
 
 	"github.com/mayron1806/api-template/config"
+	_ "github.com/mayron1806/api-template/docs"
 	"github.com/mayron1806/api-template/internal/logger"
 	"github.com/mayron1806/api-template/internal/module/app"
 	"go.uber.org/fx"

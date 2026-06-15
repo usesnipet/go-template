@@ -15,6 +15,16 @@ func (h *UserHandler) RegisterRoutes(router fiber.Router) {
 	router.Post("/", h.Create)
 }
 
+// FindByID godoc
+//
+//	@Summary		Find user by ID
+//	@Description Return a user by ID.
+//	@Tags			users
+//	@Produce		json
+//	@Param			id	path		string	true	"User ID"
+//	@Success		200	{object}	User
+//	@Failure		500	{object}	api.ErrorResponse
+//	@Router			/users/{id} [GET]
 func (h *UserHandler) FindByID(c fiber.Ctx) error {
 	id := c.Params("id")
 	user, err := h.service.FindByID(c.Context(), id)
@@ -24,6 +34,18 @@ func (h *UserHandler) FindByID(c fiber.Ctx) error {
 	return c.JSON(user)
 }
 
+// FindAll godoc
+//
+//	@Summary		Find all users
+//	@Description	Return a list of users with pagination and optional filters.
+//	@Tags			users
+//	@Produce		json
+//	@Param			take	query		int	false	"Maximum number of records"	default(2000)
+//	@Param			skip	query		int	false	"Number of records to skip"	default(0)
+//	@Success		200		{array}		User
+//	@Failure		400		{object}	api.ErrorResponse
+//	@Failure		500		{object}	api.ErrorResponse
+//	@Router			/users [GET]
 func (h *UserHandler) FindAll(c fiber.Ctx) error {
 	options, err := filter.FromFiber[User](c)
 	if err != nil {
@@ -37,6 +59,18 @@ func (h *UserHandler) FindAll(c fiber.Ctx) error {
 	return c.JSON(users)
 }
 
+// Create godoc
+//
+//	@Summary		Create user
+//	@Description	Create a new user.
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		CreateUserDTO	true	"User data"
+//	@Success		200
+//	@Failure		400	{object}	api.ErrorResponse
+//	@Failure		500	{object}	api.ErrorResponse
+//	@Router			/users [POST]
 func (h *UserHandler) Create(c fiber.Ctx) error {
 	user := &CreateUserDTO{}
 	if err := c.Bind().Body(user); err != nil {

@@ -1,4 +1,4 @@
-.PHONY: test install dev build build-prod db-generate
+.PHONY: test install dev build build-prod db-generate swagger
 
 GO ?= go
 ATLAS ?= atlas
@@ -20,6 +20,10 @@ build:
 
 build-prod:
 	$(GO) build -ldflags "-s -w" -o ./out/api-prod ./cmd/api
+
+swagger:
+	@command -v swag >/dev/null 2>&1 || go install github.com/swaggo/swag/cmd/swag@latest
+	swag init -g main.go -d cmd/api,internal/api,internal/module/user -o docs --parseDependency
 
 db-generate:
 	@set -a && [ -f .env ] && . ./.env; set +a; \
