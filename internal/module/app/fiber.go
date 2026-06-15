@@ -12,10 +12,14 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/responsetime"
 	"github.com/gofiber/fiber/v3/middleware/static"
 	"github.com/mayron1806/api-template/config"
+	errorhandler "github.com/mayron1806/api-template/internal/module/app/error-handler"
 	"github.com/mayron1806/api-template/web"
 )
 
 func NewFiber(cfg *config.Config) (*fiber.App, fiber.Router, error) {
+	builder := errorhandler.NewErrorHandlerBuilder()
+	builder.AddMapper(errorhandler.GormMapper)
+	errorHandler := builder.Build()
 	app := fiber.New(fiber.Config{
 		AppName:      "API Template",
 		ErrorHandler: errorHandler,
