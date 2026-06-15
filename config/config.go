@@ -13,6 +13,8 @@ type Config struct {
 	Server   ServerConfig   `env:", prefix=SERVER_"`
 	Database DatabaseConfig `env:", prefix=DB_"`
 	Log      LogConfig      `env:", prefix=LOG_"`
+	Env      string         `env:"ENV, default=development"`
+	DevProxy string         `env:"DEV_PROXY, default=http://localhost:5173"`
 }
 
 func Load() (*Config, error) {

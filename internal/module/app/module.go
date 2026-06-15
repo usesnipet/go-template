@@ -16,7 +16,7 @@ import (
 var Module = fx.Module("app",
 	database.Module,
 	user.Module,
-	fx.Provide(fiber.New),
+	fx.Provide(NewFiber),
 	fx.Invoke(func(
 		app *fiber.App,
 		cfg *config.Config,
