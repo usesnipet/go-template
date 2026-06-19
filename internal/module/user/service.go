@@ -19,6 +19,10 @@ func (s *UserService) Create(ctx context.Context, model *CreateUserDTO) error {
 	)
 }
 
+func (s *UserService) UpdateByID(ctx context.Context, id string, dto *CreateUserDTO) error {
+	return s.Service.UpdateByID(ctx, id, dto.ToModel())
+}
+
 func NewUserService(repository *UserRepository, logger *logger.Logger) *UserService {
 	return &UserService{
 		Service: crud.NewService(repository.Repository, logger),

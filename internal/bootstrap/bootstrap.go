@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/usesnipet/go-template/config"
 	"github.com/usesnipet/go-template/internal/logger"
 	"github.com/usesnipet/go-template/internal/module/app"
@@ -40,13 +42,15 @@ func Bootstrap(cfg *config.Config, logger *logger.Logger) {
 	userHandler := user.NewUserHandler(userService, logger)
 	//endregion
 
-	fiberApp, router, err := app.NewFiber(cfg)
+	handler, apiRouter, serve, err := app.NewRouter(cfg)
 	if err != nil {
-		logger.Errorf("failed to create fiber app: %v", err)
+		logger.Errorf("failed to create router: %v", err)
 		return
 	}
 
-	userHandler.RegisterRoutes(router.Group("/users"))
+	apiRouter.Route("/users", func(r chi.Router) {
+		userHandler.RegisterRoutes(r, serve)
+	})
 
 	addr := fmt.Sprintf(":%d", cfg.Server.Port)
 	ln, err := net.Listen("tcp", addr)
@@ -55,9 +59,11 @@ func Bootstrap(cfg *config.Config, logger *logger.Logger) {
 		return
 	}
 
+	server := &http.Server{Handler: handler}
+
 	go func() {
 		logger.Infof("server listening on %s", addr)
-		if err := fiberApp.Listener(ln); err != nil {
+		if err := server.Serve(ln); err != nil && err != http.ErrServerClosed {
 			logger.Errorf("server listener stopped: %v", err)
 		}
 	}()
@@ -71,7 +77,7 @@ func Bootstrap(cfg *config.Config, logger *logger.Logger) {
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.Server.ShutdownTimeout)
 	defer cancel()
 
-	if err := fiberApp.ShutdownWithContext(ctx); err != nil {
+	if err := server.Shutdown(ctx); err != nil {
 		logger.Errorf("server shutdown failed: %v", err)
 	}
 

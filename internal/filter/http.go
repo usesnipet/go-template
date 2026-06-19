@@ -2,20 +2,22 @@ package filter
 
 import (
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/gofiber/fiber/v3"
 	"github.com/usesnipet/go-template/internal/model"
 )
 
-func FromFiber[T model.Model](c fiber.Ctx) (*Options[T], error) {
-	take, err := strconv.Atoi(c.Query("take", "2000"))
+func FromRequest[T model.Model](r *http.Request) (*Options[T], error) {
+	queries := queriesFromRequest(r)
+
+	take, err := strconv.Atoi(queryValue(queries, "take", "2000"))
 	if err != nil {
 		take = 2000
 	}
 
-	skip, err := strconv.Atoi(c.Query("skip", "0"))
+	skip, err := strconv.Atoi(queryValue(queries, "skip", "0"))
 	if err != nil {
 		skip = 0
 	}
@@ -26,9 +28,8 @@ func FromFiber[T model.Model](c fiber.Ctx) (*Options[T], error) {
 		Order: OrderOptions{
 			Fields: func() map[string]OrderDirection {
 				fields := make(map[string]OrderDirection)
-				for key, value := range c.Queries() {
+				for key, value := range queries {
 					if strings.HasPrefix(key, "order[") && strings.HasSuffix(key, "]") {
-						// remove "order[" and "]"
 						key = strings.TrimPrefix(strings.TrimSuffix(key, "]"), "order[")
 						fields[key] = ParseOrderDirection(value)
 					}
@@ -38,7 +39,7 @@ func FromFiber[T model.Model](c fiber.Ctx) (*Options[T], error) {
 		},
 	}
 
-	whereFields, err := parseWhereFiber(c.Queries())
+	whereFields, err := parseWhereQuery(queries)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +48,25 @@ func FromFiber[T model.Model](c fiber.Ctx) (*Options[T], error) {
 	return options, nil
 }
 
-func parseWhereFiber(queries map[string]string) (map[string]WhereFieldOptions, error) {
+func queriesFromRequest(r *http.Request) map[string]string {
+	values := r.URL.Query()
+	queries := make(map[string]string, len(values))
+	for key, value := range values {
+		if len(value) > 0 {
+			queries[key] = value[0]
+		}
+	}
+	return queries
+}
+
+func queryValue(queries map[string]string, key, fallback string) string {
+	if value, ok := queries[key]; ok {
+		return value
+	}
+	return fallback
+}
+
+func parseWhereQuery(queries map[string]string) (map[string]WhereFieldOptions, error) {
 	fields := make(map[string]WhereFieldOptions)
 	for key, value := range queries {
 		if strings.HasPrefix(key, "where[") {

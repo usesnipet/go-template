@@ -13,9 +13,9 @@ type Service[T model.Model] struct {
 	Logger     *logger.Logger
 }
 
-func (s *Service[T]) Create(ctx context.Context, model *T) error {
+func (s *Service[T]) Create(ctx context.Context, model any) error {
 	s.Logger.Verbosef("Create: %+v", model)
-	return s.Repository.Create(ctx, model)
+	return s.Repository.Create(ctx, model.(*T))
 }
 
 func (s *Service[T]) FindByID(ctx context.Context, id string) (T, error) {

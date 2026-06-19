@@ -1,14 +1,16 @@
 package errorhandler
 
 import (
-	"github.com/gofiber/fiber/v3"
+	"net/http"
+
+	"github.com/usesnipet/go-template/internal/api"
 	"gorm.io/gorm"
 )
 
 func GormMapper(err error) (error, bool) {
 	switch err {
 	case gorm.ErrRecordNotFound:
-		return fiber.NewError(fiber.StatusNotFound, "record not found"), true
+		return api.NewHTTPError(http.StatusNotFound, "record not found"), true
 	case gorm.ErrInvalidTransaction,
 		gorm.ErrNotImplemented,
 		gorm.ErrMissingWhereClause,
@@ -20,7 +22,7 @@ func GormMapper(err error) (error, bool) {
 		gorm.ErrInvalidDB,
 		gorm.ErrInvalidField,
 		gorm.ErrInvalidValue:
-		return fiber.NewError(fiber.StatusInternalServerError, "internal server error"), true
+		return api.NewHTTPError(http.StatusInternalServerError, "internal server error"), true
 	default:
 		return err, false
 	}
