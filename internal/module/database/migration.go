@@ -12,7 +12,7 @@ import (
 	"github.com/usesnipet/go-template/internal/logger"
 )
 
-func runMigrations(cfg *config.Config, logger *logger.Logger) error {
+func RunMigrations(cfg *config.Config, logger *logger.Logger) error {
 	if !cfg.Database.AutoMigrate {
 		logger.Info("auto-migrate is disabled, skipping migrations")
 		return nil

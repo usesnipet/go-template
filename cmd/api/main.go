@@ -11,10 +11,8 @@ import (
 
 	"github.com/usesnipet/go-template/config"
 	_ "github.com/usesnipet/go-template/docs"
+	"github.com/usesnipet/go-template/internal/bootstrap"
 	"github.com/usesnipet/go-template/internal/logger"
-	"github.com/usesnipet/go-template/internal/module/app"
-	"go.uber.org/fx"
-	"go.uber.org/fx/fxevent"
 )
 
 func main() {
@@ -34,12 +32,5 @@ func main() {
 		appLogger.Warn(parseErr.Error())
 	}
 
-	fx.New(
-		fx.WithLogger(func() fxevent.Logger {
-			return logger.NewFXEventLogger(appLogger)
-		}),
-		fx.StopTimeout(cfg.Server.ShutdownTimeout),
-		fx.Supply(cfg, appLogger),
-		app.Module,
-	).Run()
+	bootstrap.Bootstrap(cfg, appLogger)
 }
