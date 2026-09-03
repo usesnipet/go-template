@@ -3,90 +3,91 @@ package bootstrap
 import (
 	"context"
 	"fmt"
-	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/usesnipet/go-template/config"
+	_ "github.com/usesnipet/go-template/docs/swagger"
+	"github.com/usesnipet/go-template/internal/api"
+	"github.com/usesnipet/go-template/internal/guard"
+	"github.com/usesnipet/go-template/internal/infra/database"
 	"github.com/usesnipet/go-template/internal/logger"
-	"github.com/usesnipet/go-template/internal/module/app"
-	"github.com/usesnipet/go-template/internal/module/database"
-	"github.com/usesnipet/go-template/internal/module/user"
+	systemmodule "github.com/usesnipet/go-template/internal/module/system"
+	"github.com/usesnipet/go-template/internal/repository"
+	"github.com/usesnipet/go-template/web"
 )
 
-func Bootstrap(cfg *config.Config, logger *logger.Logger) {
-	//region Database
-	db, err := database.NewDatabase(cfg)
+// Bootstrap wires the application: database, repositories, services,
+// handlers, HTTP server. Add a new module here after scaffolding it with
+// the create-backend-module skill — construct its repo, then its service,
+// then its handler, then call RegisterRoutes inside the /api group.
+func Bootstrap(cfg *config.Config, logger *logger.Logger) error {
+	// database
+	db, _, embeddedDB, err := database.NewDatabase(cfg, logger)
 	if err != nil {
 		logger.Errorf("failed to create database: %v", err)
-		return
-	}
-	if err := database.RunMigrations(cfg, logger); err != nil {
-		logger.Errorf("failed to run migrations: %v", err)
-		return
-	}
-	//endregion
-
-	//region Repositories
-	userRepository := user.NewUserRepository(db, logger)
-	//endregion
-
-	//region Services
-	userService := user.NewUserService(userRepository, logger)
-	//endregion
-
-	//region Handlers
-	userHandler := user.NewUserHandler(userService, logger)
-	//endregion
-
-	handler, apiRouter, serve, err := app.NewRouter(cfg)
-	if err != nil {
-		logger.Errorf("failed to create router: %v", err)
-		return
+		return err
 	}
 
-	apiRouter.Route("/users", func(r chi.Router) {
-		userHandler.RegisterRoutes(r, serve)
+	if embeddedDB != nil {
+		defer func() {
+			logger.Infof("stopping embedded database...")
+			if err := embeddedDB.Stop(); err != nil {
+				logger.Errorf("failed to stop embedded database: %v", err)
+				return
+			}
+			logger.Infof("embedded database stopped successfully")
+		}()
+	}
+
+	// repositories
+	//   txManager := repository.NewTxManager(db)
+	//   fooRepo := repository.NewFooRepository(db)
+	_ = repository.NewTxManager(db)
+
+	// guards
+	requireBasicAuth := guard.RequireBasicAuth(cfg.Auth.BasicAuthUsername, cfg.Auth.BasicAuthPassword)
+	_ = requireBasicAuth
+
+	// services
+	systemService := systemmodule.NewService()
+
+	// handlers
+	systemHandler := systemmodule.NewHandler(systemService)
+
+	// register routes
+	api := api.New()
+	api.Router.Handle("/*", web.Handler())
+	api.Router.Route(config.APIPrefix, func(r chi.Router) {
+		systemHandler.RegisterRoutes(r, api.Serve)
 	})
 
-	addr := fmt.Sprintf(":%d", cfg.Server.Port)
-	ln, err := net.Listen("tcp", addr)
-	if err != nil {
-		logger.Errorf("failed to listen on %s: %v", addr, err)
-		return
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", cfg.Server.Port),
+		Handler: api.Router,
 	}
 
-	server := &http.Server{Handler: handler}
-
 	go func() {
-		logger.Infof("server listening on %s", addr)
-		if err := server.Serve(ln); err != nil && err != http.ErrServerClosed {
-			logger.Errorf("server listener stopped: %v", err)
+		logger.Infof("server started on port %d", cfg.Server.Port)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Errorf("failed to start server: %v", err)
 		}
 	}()
 
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	<-ctx.Done()
 
-	logger.Info("shutting down server...")
-
-	ctx, cancel := context.WithTimeout(context.Background(), cfg.Server.ShutdownTimeout)
+	logger.Infof("shutting down server...")
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-
-	if err := server.Shutdown(ctx); err != nil {
-		logger.Errorf("server shutdown failed: %v", err)
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		logger.Errorf("failed to shutdown server: %v", err)
 	}
 
-	sqlDB, err := db.DB()
-	if err != nil {
-		logger.Errorf("failed to get sql db: %v", err)
-	} else if err := sqlDB.Close(); err != nil {
-		logger.Errorf("failed to close database: %v", err)
-	}
-
-	logger.Info("server stopped")
+	return nil
 }

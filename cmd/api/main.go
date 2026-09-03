@@ -1,7 +1,3 @@
-// @title           API Template
-// @version         1.0
-// @description     Documentation for the API Template.
-// @BasePath        /api
 package main
 
 import (
@@ -10,11 +6,21 @@ import (
 	"os"
 
 	"github.com/usesnipet/go-template/config"
-	_ "github.com/usesnipet/go-template/docs"
 	"github.com/usesnipet/go-template/internal/bootstrap"
 	"github.com/usesnipet/go-template/internal/logger"
 )
 
+// @title						orders API
+// @version					1.0
+// @description				API for the orders platform.
+// @BasePath					/api
+// @securityDefinitions.apikey	ApiKeyAuth
+// @in							header
+// @name						X-API-Key
+// @securityDefinitions.jwt	BearerAuth
+// @in							header
+// @name						Authorization
+// @securityDefinitions.basic	BasicAuth
 func main() {
 	cfg, err := config.Load()
 	if err != nil {

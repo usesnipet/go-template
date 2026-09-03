@@ -1,7 +1,7 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
 
 type Props = React.ComponentProps<"input"> & {
@@ -9,6 +9,7 @@ type Props = React.ComponentProps<"input"> & {
   name: string;
   fieldclassname?: string;
   split?: boolean | { separator: string; type?: "string" | "number" };
+  description?: string;
 };
 
 export const FormInput = ({ split, ...props }: Props = { split: false } as Props) => {
@@ -32,6 +33,7 @@ export const FormInput = ({ split, ...props }: Props = { split: false } as Props
           <FormControl>
             <Input
               disabled={isLoading}
+              aria-description={props.description}
               {...props}
               value={
                 splitOptions && Array.isArray(field.value)
@@ -54,6 +56,7 @@ export const FormInput = ({ split, ...props }: Props = { split: false } as Props
               }}
             />
           </FormControl>
+          {props.description && <FormDescription>{props.description}</FormDescription>}
           <FormMessage />
         </FormItem>
       )}

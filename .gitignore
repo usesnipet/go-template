@@ -45,3 +45,12 @@ sketch
 
 
 .env
+web/.env
+
+# machine-local Claude Code settings
+.claude/settings.local.json
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+graft/
+
+.pnpm-store/
