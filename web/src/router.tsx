@@ -1,24 +1,30 @@
-import type { ComponentType } from "react";
-import { lazy } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { BrowserRouter, Route, Routes } from "react-router";
 
-import { AppLayout } from "./components/app-layout";
+import { LoadingFallback } from "./components/loading-fallback";
+import { ROUTES } from "./routes";
 
-const lazyPage = (importFn: () => Promise<Record<string, ComponentType>>, name: string) =>
-  lazy(() => importFn().then((module) => ({ default: module[name] })));
+import type { RoutePath } from "./routes";
 
-const HomePage = lazyPage(() => import("./pages/page"), "HomePage");
-const SettingsPage = lazyPage(() => import("./pages/settings/page"), "SettingsPage");
+const Layout = lazy(() =>
+  import("./routes/layout").then((m) => ({ default: m.Layout })));
+const HomePage = lazy(() =>
+  import("./routes/page").then((m) => ({ default: m.HomePage })));
+
+const toReactRouterPath = (path: RoutePath) => {
+  return path.replaceAll(/{([^}]+)}/g, (_, p1) => `:${p1}`);
+}
 
 export const Router = () => {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route element={<AppLayout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Route>
-      </Routes>
+      <Suspense fallback={<LoadingFallback className="min-h-svh" />}>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path={toReactRouterPath(ROUTES.home)} element={<HomePage />} />
+          </Route>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }

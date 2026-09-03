@@ -22,7 +22,7 @@ RUN go mod download
 COPY . .
 COPY --from=web-builder /app/web/dist ./web/dist
 
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-s -w" -o /api ./cmd/api
+RUN CGO_ENABLED=0 GOOS=linux go build -tags web -ldflags "-s -w" -o /api ./cmd/api
 
 FROM alpine:3.21
 
@@ -34,10 +34,11 @@ WORKDIR /app
 
 COPY --from=api-builder /api ./api
 COPY migrations ./migrations
+COPY docs/swagger ./docs/swagger
 
 USER app
 
-EXPOSE 8852
+EXPOSE 8080
 
 ENV ENV=production
 

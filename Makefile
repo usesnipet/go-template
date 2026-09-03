@@ -1,8 +1,11 @@
-.PHONY: test install dev build build-prod db-generate swagger
+.PHONY: test install dev dev-api dev-web build build-prod db-generate db-hash mocks fix swagger
 
 GO ?= go
 ATLAS ?= atlas
 ATLAS_ENV ?= local
+PNPM ?= pnpm
+SWAG ?= $(GO) tool swag
+AIR ?= $(GO) tool air
 
 MIGRATION_NAME ?= $(strip $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS)))
 RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
@@ -12,20 +15,29 @@ $(RUN_ARGS):
 install:
 	$(GO) install ./...
 
+test:
+	$(GO) test ./...
+
+mocks:
+	$(GO) tool mockery
+
 dev:
-	air
+	$(MAKE) -j2 dev-api dev-web
+
+dev-api:
+	$(AIR)
+
+dev-web:
+	cd web && $(PNPM) dev
 
 build:
 	$(GO) build -o ./tmp/api ./cmd/api
 
 build-prod:
-	$(GO) build -ldflags "-s -w" -o ./out/api-prod ./cmd/api
+	cd web && pnpm build && cd .. && $(GO) build -tags web -ldflags "-s -w" -o ./out/web-prod ./cmd/api
 
-swagger:
-	@command -v swag >/dev/null 2>&1 || go install github.com/swaggo/swag/cmd/swag@latest
-	swag init -g main.go -d cmd/api,internal/api,internal/module -o docs --parseDependency
-	# $(GO) run ./tools/normalizeswagger ./docs
-	cd web && pnpm codegen
+build-prod-api:
+	$(GO) build -ldflags "-s -w" -o ./out/api-prod ./cmd/api
 
 db-generate:
 	@set -a && [ -f .env ] && . ./.env; set +a; \
@@ -35,3 +47,13 @@ db-generate:
 		exit 1; \
 	fi; \
 	$(ATLAS) migrate diff "$(MIGRATION_NAME)" --env $(ATLAS_ENV)
+
+
+db-hash:
+	$(ATLAS) migrate hash --env $(ATLAS_ENV)
+
+fix:
+	$(GO) fix ./...
+
+openapi:
+	$(SWAG) init -g cmd/api/main.go -o docs/swagger --parseDependency --parseInternal --useStructName

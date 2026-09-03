@@ -4,7 +4,12 @@ import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "./error-fallback";
 import { LoadingFallback } from "./loading-fallback";
 
-const PageActionsContext = createContext<((node: React.ReactNode) => void) | null>(null);
+type PageActionsContextType = {
+  setActions: (node: React.ReactNode) => void;
+  setLeftActions: (node: React.ReactNode) => void;
+};
+
+const PageActionsContext = createContext<PageActionsContextType | null>(null);
 
 export type PageProps = {
   title: string;
@@ -13,27 +18,35 @@ export type PageProps = {
   children: React.ReactNode;
   /** Prefer {@link PageActions} inside `content.tsx` when actions need colocation. */
   actions?: React.ReactNode;
+  leftActions?: React.ReactNode;
 };
 
-export function Page({ title, description, documentTitle, children, actions }: PageProps) {
+export function Page({ title, description, documentTitle, children, actions, leftActions }: PageProps) {
   const [slotActions, setSlotActions] = useState<React.ReactNode>(null);
+  const [slotLeftActions, setSlotLeftActions] = useState<React.ReactNode>(null);
+
   const headerActions = actions ?? slotActions;
+  const headerLeftActions = leftActions ?? slotLeftActions;
 
   useEffect(() => {
     document.title = documentTitle;
   }, [documentTitle]);
 
   return (
-    <PageActionsContext.Provider value={setSlotActions}>
-        <div className="flex flex-1 flex-col gap-4 px-4 py-8 sm:px-6 lg:px-10 h-full">
-          <div className="flex flex-col gap-2 divide-y h-full">
-            <header className="pb-2 flex items-center justify-between">
+    <PageActionsContext.Provider value={{ setActions: setSlotActions, setLeftActions: setSlotLeftActions }}>
+      <div className="flex min-h-0 flex-1 flex-col gap-4 px-4 py-4">
+        <div className="flex min-h-0 flex-1 flex-col gap-2 divide-y">
+          <header className="flex shrink-0 items-center justify-between pb-2">
+            <div className="flex items-center gap-2">
+              {headerLeftActions && <div>{headerLeftActions}</div>}
               <div>
                 <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
                 <p className="text-muted-foreground text-sm">{description}</p>
               </div>
-              {headerActions && <div>{headerActions}</div>}
-            </header>
+            </div>
+            {headerActions && <div className="flex items-center gap-2 justify-end">{headerActions}</div>}
+          </header>
+          <div className="flex min-h-0 flex-1 flex-col pt-2">
             <ErrorBoundary fallbackRender={({ error }) => <ErrorFallback error={error as Error} />}>
               <Suspense fallback={<LoadingFallback />}>
                 {children}
@@ -41,16 +54,20 @@ export function Page({ title, description, documentTitle, children, actions }: P
             </ErrorBoundary>
           </div>
         </div>
+      </div>
     </PageActionsContext.Provider>
   );
 }
-
-/** Renders actions in the page header while keeping definition in `content.tsx`. */
-export function PageActions({ children }: { children: React.ReactNode }) {
-  const setActions = useContext(PageActionsContext);
-  if (!setActions) {
+const usePage = () => {
+  const context = useContext(PageActionsContext);
+  if (!context) {
     throw new Error("PageActions must be used within Page");
   }
+  return context;
+}
+/** Renders actions in the page header while keeping definition in `content.tsx`. */
+export function PageActions({ children }: { children: React.ReactNode }) {
+  const { setActions } = usePage();
 
   useLayoutEffect(() => {
     setActions(children);
@@ -59,3 +76,17 @@ export function PageActions({ children }: { children: React.ReactNode }) {
 
   return null;
 }
+
+
+/** Renders left actions in the page header while keeping definition in `content.tsx`. */
+export function PageLeftActions({ children }: { children: React.ReactNode }) {
+  const { setLeftActions } = usePage();
+
+  useLayoutEffect(() => {
+    setLeftActions(children);
+    return () => setLeftActions(null);
+  });
+
+  return null;
+}
+

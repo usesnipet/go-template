@@ -7,9 +7,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function mapBy<T, K extends string | number | symbol>(array: T[], key: (item: T) => K): Map<K, T> {
-  return array.reduce((acc, item) => {
-    acc.set(key(item), item);
-    return acc;
-  }, new Map<K, T>());
+export function truncate(text: string, maxLength: number) {
+  return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
 }

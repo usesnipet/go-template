@@ -4,53 +4,45 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+
+	apperr "github.com/usesnipet/go-template/internal/app-err"
 )
 
-func WriteJSON(w http.ResponseWriter, status int, v any) error {
+// Error is an alias for apperr.Error, exposed here so handler packages can
+// reference it in swagger annotations without importing internal/app-err directly.
+type Error = apperr.Error
+
+func WriteJSON(w http.ResponseWriter, status int, data any) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	if v == nil {
+	return json.NewEncoder(w).Encode(data)
+}
+
+func WriteNoContent(w http.ResponseWriter) error {
+	w.WriteHeader(http.StatusNoContent)
+	return nil
+}
+
+func WriteAppError(w http.ResponseWriter, err *apperr.Error) error {
+	WriteJSON(w, err.StatusCode, err)
+	return nil
+}
+
+func WriteError(w http.ResponseWriter, status int, err error) error {
+	var appErr *apperr.Error
+	if errors.As(err, &appErr) {
+		WriteAppError(w, appErr)
 		return nil
 	}
-	return json.NewEncoder(w).Encode(v)
-}
-
-func WriteStatus(w http.ResponseWriter, status int) error {
-	w.WriteHeader(status)
+	WriteJSON(
+		w,
+		status,
+		apperr.Error{
+			StatusCode: status,
+			Err:        err,
+			Message:    err.Error(),
+			Details:    nil,
+		},
+	)
 	return nil
-}
-
-func DecodeJSON(r *http.Request, v any) error {
-	if r.Body == nil {
-		return NewHTTPError(http.StatusBadRequest, "request body is required")
-	}
-	defer r.Body.Close()
-
-	if err := json.NewDecoder(r.Body).Decode(v); err != nil {
-		return NewHTTPError(http.StatusBadRequest, "invalid request body")
-	}
-	return nil
-}
-
-func WriteError(w http.ResponseWriter, err error) {
-	status := http.StatusInternalServerError
-	message := http.StatusText(status)
-
-	var httpErr *HTTPError
-	if errors.As(err, &httpErr) {
-		status = httpErr.StatusCode
-		if httpErr.Message != "" {
-			message = httpErr.Message
-		} else {
-			message = http.StatusText(status)
-		}
-	} else if err != nil {
-		message = err.Error()
-	}
-
-	_ = WriteJSON(w, status, ErrorResponse{
-		Error:      message,
-		StatusCode: status,
-		StatusText: http.StatusText(status),
-	})
 }
